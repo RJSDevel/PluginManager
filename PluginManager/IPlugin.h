@@ -10,7 +10,7 @@
 
 class IPlugin {
 public:
-	virtual bool OnRegister(IPluginManager* manager) = 0;
+	virtual void OnRegister(IPluginManager* manager) = 0;
 
 	virtual char* GetPluginName() = 0;
 

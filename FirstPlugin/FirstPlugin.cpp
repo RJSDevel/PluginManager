@@ -6,7 +6,7 @@
 class FirstPlugin: public IPlugin
 {
 public:
-	virtual bool OnRegister(IPluginManager* manager);
+	virtual void OnRegister(IPluginManager* manager);
 
 	virtual char* GetPluginName();
 
@@ -15,9 +15,8 @@ public:
 	virtual void OnDestroy(IPluginManager* manager);
 };
 
-bool FirstPlugin::OnRegister(IPluginManager* manager) {
+void FirstPlugin::OnRegister(IPluginManager* manager) {
 	MessageBoxA(0, "OnRegister", "", 0);
-	return true;
 }
 
 char* FirstPlugin::GetPluginName() {

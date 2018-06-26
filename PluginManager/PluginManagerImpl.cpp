@@ -7,43 +7,58 @@ PluginManagerImpl::PluginManagerImpl()
 
 void PluginManagerImpl::RegisterPlugin(int id, IPlugin* plugin, HMODULE* module)
 {
-	if (plugin->OnRegister(this)) {
+	try {
+		plugin->OnRegister(this);
 		plugins.insert(plugins.cend(), std::pair<int, IPlugin*>(id, plugin));
 		pluginModules.insert(pluginModules.cend(), std::pair<int, HMODULE*>(id, module));
+	}
+	catch (...) {
+
 	}
 }
 
 bool PluginManagerImpl::Activated(int id)
 {
-	for (std::map<int, IPlugin*>::iterator it = plugins.begin(); it != plugins.end(); ++it)
-	{
-		if (it->first == id)
+	try {
+		for (std::map<int, IPlugin*>::iterator it = plugins.begin(); it != plugins.end(); ++it)
 		{
-			it->second->OnActivate(this);
-			return true;
+			if (it->first == id)
+			{
+				it->second->OnActivate(this);
+				return true;
+			}
 		}
 	}
+	catch (...) {
+
+	}
+
 	return false;
 }
 
 PluginManagerImpl::~PluginManagerImpl()
 {
-	for (std::map<int, HMODULE*>::iterator it = pluginModules.begin(); it != pluginModules.end(); ++it)
-	{
-		for (std::map<int, IPlugin*>::iterator itp = plugins.begin(); itp != plugins.end(); ++itp)
+	try {
+		for (std::map<int, HMODULE*>::iterator it = pluginModules.begin(); it != pluginModules.end(); ++it)
 		{
-			if (itp->first == it->first)
+			for (std::map<int, IPlugin*>::iterator itp = plugins.begin(); itp != plugins.end(); ++itp)
 			{
-				itp->second->OnDestroy(this);
-				break;
+				if (itp->first == it->first)
+				{
+					itp->second->OnDestroy(this);
+					break;
+				}
 			}
+
+			FreeLibrary(*it->second);
 		}
 
-		FreeLibrary(*it->second);
+		pluginModules.clear();
+		plugins.clear();
 	}
+	catch (...) {
 
-	pluginModules.clear();
-	plugins.clear();
+	}
 }
 
 
